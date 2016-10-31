@@ -1,0 +1,17 @@
+spring:
+  profiles.active: dev
+---
+spring:
+  profiles: dev
+logging:
+  level:
+    org.springframework.web: INFO
+    de.wits.appointment: TRACE
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+rest:
+  templateUrl: http://localhost:8080/templates
+path:
+  pdf: /home/alberto/Desktop/output/pdf/
+  temporal: /home/alberto/Desktop/output/tmp/
+  pdfLatex: /usr/bin/latex
