@@ -1,7 +1,6 @@
 package de.wits.pdf.service;
 
-import de.wits.pdf.configuration.FileSystemPathConfig;
-import de.wits.pdf.exception.PDFCreationFailedException;
+import de.wits.pdf.configuration.FileSystemPathProperties;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,13 +25,13 @@ public class PdfServiceImpl implements PdfService {
   private static final int RUN_COUNT = 3;
 
   @Autowired
-  private transient FileSystemPathConfig fileSystemPathConfig;
+  private transient FileSystemPathProperties fileSystemPathConfig;
 
   Resource outputResource;
 
   @PostConstruct
   void init() {
-    outputResource = new FileSystemResource(new File(fileSystemPathConfig.getPdf()));
+    outputResource = new FileSystemResource(new File(fileSystemPathConfig.getPdf())); // TODO call every time is needed
   }
 
   @Override

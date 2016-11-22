@@ -1,6 +1,6 @@
 package de.wits.pdf.task;
 
-import de.wits.pdf.configuration.FileSystemPathConfig;
+import de.wits.pdf.configuration.FileSystemPathProperties;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,7 +25,7 @@ public class CleanupTask {
   private File outputFolder;
 
   @Autowired
-  FileSystemPathConfig fileSystemPathConfig;
+  FileSystemPathProperties fileSystemPathConfig;
 
   @PostConstruct
   void init() {
@@ -37,7 +37,7 @@ public class CleanupTask {
     for (File file : outputFolder.listFiles()) {
       if (file.isFile()) {
         BasicFileAttributes attr = Files.readAttributes(Paths.get(file.getAbsolutePath()), BasicFileAttributes.class);
-        if (System.currentTimeMillis() - attr.creationTime().toMillis() > 60000) {
+        if (System.currentTimeMillis() - attr.creationTime().toMillis() > 60000) { // TODO set to one day
           // Delete files that were generated 1 minute ago
           file.delete();
         }

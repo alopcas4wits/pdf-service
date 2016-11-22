@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "path")
-public class FileSystemPathConfig {
+public class FileSystemPathProperties {
 
   private String pdf;
 

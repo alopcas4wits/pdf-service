@@ -1,4 +1,4 @@
-package de.wits.pdf.exception;
+package de.wits.pdf.service;
 
 /**
  * Created by User on 14.07.2016.
