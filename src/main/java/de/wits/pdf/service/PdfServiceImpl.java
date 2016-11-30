@@ -7,14 +7,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.PathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +24,6 @@ public class PdfServiceImpl implements PdfService {
 
   @Autowired
   private transient FileSystemPathProperties fileSystemPathConfig;
-
-  Resource outputResource;
-
-  @PostConstruct
-  void init() {
-    outputResource = new FileSystemResource(new File(fileSystemPathConfig.getPdf())); // TODO call every time is needed
-  }
 
   @Override
   public File getPdf(String template) throws PDFCreationFailedException {
@@ -95,7 +86,7 @@ public class PdfServiceImpl implements PdfService {
           throw new PDFCreationFailedException("pdfLaTeX was interrupted", ex);
         }
       }
-      outputFile = new File(outputResource.getFile(), System.currentTimeMillis() + templateFile.getName().replaceAll(".tex$", ".pdf"));
+      outputFile = new File(new FileSystemResource(new File(fileSystemPathConfig.getPdf())).getFile(), System.currentTimeMillis() + templateFile.getName().replaceAll(".tex$", ".pdf"));
       LOG.info("PDF successfully created. Moving to output resource: {}", outputFile.getAbsolutePath());
       WritableResource writableResource = new PathResource(outputFile.getAbsolutePath());
 
