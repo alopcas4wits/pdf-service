@@ -1,0 +1,9 @@
+FROM openjdk:8-jre
+MAINTAINER Alberto López Castilla <alberto.lopezcastilla@4wits.de>
+
+#"-agentpath:/jrebel/lib/libjrebel64.so", "-Drebel.log.file=/jrebel.log",
+CMD ["java", "-Xdebug","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5702", "-Xmx200m", "-jar", "/app/app.jar"]
+
+#CMD ["java", "-javaagent:/jrebel/jrebel.jar", "-Drebel.log.file=/jrebel.log", "-jar", "/app/app.jar"]
+
+EXPOSE 5702

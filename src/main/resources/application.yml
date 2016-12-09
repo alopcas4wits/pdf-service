@@ -13,3 +13,5 @@ path:
   pdf: /home/alberto/Desktop/output/pdf/
   temporal: /home/alberto/Desktop/output/tmp/
   pdfLatex: /usr/bin/latex
+server:
+  port: 5702
