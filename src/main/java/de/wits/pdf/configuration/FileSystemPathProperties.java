@@ -1,9 +1,7 @@
 package de.wits.pdf.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Component
 @ConfigurationProperties(prefix = "path")
 public class FileSystemPathProperties {
 

@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.WebApplicationInitializer;
@@ -12,6 +13,7 @@ import org.springframework.web.WebApplicationInitializer;
 @SpringBootApplication
 @EnableConfigurationProperties
 @EnableScheduling
+@EnableDiscoveryClient
 @ComponentScan
 public class Application extends SpringBootServletInitializer implements WebApplicationInitializer {
 

@@ -5,22 +5,19 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.PathResource;
-import org.springframework.core.io.WritableResource;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PdfServiceImpl implements PdfService {
 
   private static final Logger LOG = LoggerFactory.getLogger(PdfServiceImpl.class);
-  private static final int RUN_COUNT = 3;
+  private static final int RUN_COUNT = 1;
 
   @Autowired
   private transient FileSystemPathProperties fileSystemPathConfig;
@@ -29,8 +26,8 @@ public class PdfServiceImpl implements PdfService {
   public File getPdf(String template) throws PDFCreationFailedException {
     File file = null;
     try {
-      File tmpFile = new File(fileSystemPathConfig.getTemporal() + UUID.randomUUID(), "template.tex");
-      FileUtils.writeStringToFile(tmpFile, template);
+      File tmpFile = new File(fileSystemPathConfig.getTemporal() + File.separator + UUID.randomUUID(), "template.tex");
+      FileUtils.writeStringToFile(tmpFile, template, "UTF-8");
       file = generate(tmpFile);
     } catch (Exception e) {
       throw new PDFCreationFailedException("Could not create PDF Document.", e);
@@ -42,7 +39,7 @@ public class PdfServiceImpl implements PdfService {
   public File generate(File templateFile) throws PDFCreationFailedException, IOException {
     File outputFile = null;
     try {
-      String pdfLatexPath = "/usr/bin/latex";
+      String pdfLatexPath = fileSystemPathConfig.getPdfLatex();
       String pdfLatexMode = "--interaction=nonstopmode";
       String pdfLatexOutput = "--output-directory=" + templateFile.getParent();
       String shellEscapeCommand = "--shell-escape";
@@ -86,16 +83,11 @@ public class PdfServiceImpl implements PdfService {
           throw new PDFCreationFailedException("pdfLaTeX was interrupted", ex);
         }
       }
-      outputFile = new File(new FileSystemResource(new File(fileSystemPathConfig.getPdf())).getFile(), System.currentTimeMillis() + templateFile.getName().replaceAll(".tex$", ".pdf"));
+      outputFile = new File(new FileSystemResource(new File(templateFile.getParent())).getFile(), templateFile.getName().replaceAll(".tex$", ".pdf"));
       LOG.info("PDF successfully created. Moving to output resource: {}", outputFile.getAbsolutePath());
-      WritableResource writableResource = new PathResource(outputFile.getAbsolutePath());
-
-      try (OutputStream outputStream = writableResource.getOutputStream()) {
-        outputStream.write(FileUtils.readFileToByteArray(new File(templateFile.getAbsolutePath().replaceAll(".tex$", ".dvi"))));
-      }
     } finally {
       // Clear the temp folder after the work is done
-      FileUtils.deleteDirectory(templateFile.getParentFile());
+      //FileUtils.deleteDirectory(templateFile.getParentFile());
     }
 
     return outputFile;

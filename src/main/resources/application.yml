@@ -1,5 +1,5 @@
 spring:
-  profiles.active: dev
+  profiles.active: test
 ---
 spring:
   profiles: dev
@@ -10,8 +10,40 @@ logging:
   pattern:
     console: "%d %-5level %logger : %msg%n"
 path:
-  pdf: /home/alberto/Desktop/output/pdf/
-  temporal: /home/alberto/Desktop/output/tmp/
-  pdfLatex: /usr/bin/latex
+  pdf: C:\\Users\\alberto\\Desktop\\pdf\\template
+  temporal: C:\\Users\\alberto\\Desktop\\pdf\\temporal
+  pdfLatex: pdflatex
 server:
   port: 5702
+
+eureka:
+  instance:
+    instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+---
+spring:
+  profiles: test
+logging:
+  level:
+    org.springframework.web: INFO
+    de.wits.appointment: TRACE
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+path:
+  pdf: C:\\Users\\alberto\\Desktop\\pdf\\template
+  temporal: /srv/pdf-service/temporal
+  pdfLatex: pdflatex
+server:
+  port: 5702
+
+eureka:
+  instance:
+    instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
