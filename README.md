@@ -19,5 +19,5 @@ Einmalig:
     
 Updated:
     
-    git fetch
-    git merge remotes/upstream/master --squash --allow-unrelated-histories
+    git fetch upstream
+    git merge remotes/upstream/master
