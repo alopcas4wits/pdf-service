@@ -1,0 +1,16 @@
+eureka:
+  client:
+    enabled: false
+
+spring:
+  application:
+    name: your-service
+  cloud:
+    bus:
+      enabled: false
+    discovery:
+      enabled: false
+    consul:
+      enabled: false
+    config:
+      enabled: false
