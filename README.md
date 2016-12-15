@@ -10,3 +10,14 @@ Richtigen Service Namen setzen in
 Package umbennen
 
 Application Class umbennen
+
+#### Aktualiseren
+
+Einmalig:
+    
+    git remote add upstream git@4wits.githost.io:CORE/microservice-java-seed.git
+    
+Updated:
+    
+    git fetch
+    git merge remotes/upstream/master --squash --allow-unrelated-histories
