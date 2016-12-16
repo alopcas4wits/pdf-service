@@ -32,8 +32,6 @@ import java.util.TimeZone;
 @EnableOAuth2Sso
 @EnableOAuth2Client
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@EnableAsync
-@EnableScheduling
 public class YourApplication {
 
     public static void main(String[] args) {
