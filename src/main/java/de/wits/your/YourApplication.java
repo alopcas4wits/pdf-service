@@ -3,6 +3,7 @@ package de.wits.your;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,8 @@ import java.util.TimeZone;
  */
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
+//@EnableCircuitBreaker
+@EnableFeignClients(basePackages = {"de.wits"})
 @EnableResourceServer
 @EnableOAuth2Sso
 @EnableOAuth2Client
