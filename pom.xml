@@ -100,11 +100,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-sleuth</artifactId>
         </dependency>
-		<dependency>
-            <groupId>de.4wits</groupId>
-            <artifactId>notification-starter</artifactId>
-            <version>1.0</version>
-        </dependency>
         <dependency>
             <groupId>de.4wits</groupId>
             <artifactId>message-starter</artifactId>
