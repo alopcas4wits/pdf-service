@@ -38,6 +38,7 @@ public class PdfController {
       log.error("Exception occurred while generating the PDF file", e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    log.info("Returning file");
 
     return new ResponseEntity<>(resource, HttpStatus.OK);
   }

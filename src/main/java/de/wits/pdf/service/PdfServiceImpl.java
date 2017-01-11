@@ -5,7 +5,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +22,8 @@ public class PdfServiceImpl implements PdfService {
   private static final Logger LOG = LoggerFactory.getLogger(PdfServiceImpl.class);
   private static final int RUN_COUNT = 1;
 
+  static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/.*&heightoffset=[0-9]*)");
+
   @Autowired
   private transient FileSystemPathProperties fileSystemPathConfig;
 
@@ -27,6 +32,7 @@ public class PdfServiceImpl implements PdfService {
     File file = null;
     try {
       File tmpFile = new File(fileSystemPathConfig.getTemporal() + File.separator + UUID.randomUUID(), "template.tex");
+      template = processTemplateMedia(template, tmpFile.getParentFile());
       FileUtils.writeStringToFile(tmpFile, template, "UTF-8");
       file = generate(tmpFile);
     } catch (Exception e) {
@@ -91,6 +97,30 @@ public class PdfServiceImpl implements PdfService {
     }
 
     return outputFile;
+  }
+
+  String processTemplateMedia(String template, File tempFolder) {
+    Matcher matcher = MEDIA_REGEX.matcher(template);
+    String patchedTemplate = template;
+    int mediaIndex = 0;
+    while (matcher.find()) {
+      String mediaURL = matcher.group(1);
+      mediaURL = mediaURL.replaceAll("}", ""); //FIXME: write a decent regex
+      String filteredURL = mediaURL.replace("\\", "");
+      String mediaName = "img" + mediaIndex + ".png";
+      File mediaFolder = new File(tempFolder, mediaName);
+      LOG.info("Downloading media at " + filteredURL);
+      try {
+        FileUtils.copyURLToFile(new URL(filteredURL), mediaFolder);
+      } catch (IOException ex) {
+        LOG.warn("Ignoring malformed URL: " + mediaURL);
+      }
+
+      patchedTemplate = patchedTemplate.replace("img:" + mediaURL, mediaName);
+      mediaIndex++;
+    }
+
+    return patchedTemplate;
   }
 
 }
