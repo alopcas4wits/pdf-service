@@ -1,5 +1,6 @@
 package de.wits.pdf;
 
+import de.wits.pdf.configuration.FileSystemPathProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -11,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.WebApplicationInitializer;
 
 @SpringBootApplication
-@EnableConfigurationProperties
+@EnableConfigurationProperties({FileSystemPathProperties.class})
 @EnableScheduling
 @EnableDiscoveryClient
 @ComponentScan

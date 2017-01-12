@@ -24,8 +24,12 @@ public class PdfServiceImpl implements PdfService {
 
   static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/.*&heightoffset=[0-9]*)");
 
-  @Autowired
   private transient FileSystemPathProperties fileSystemPathConfig;
+
+  @Autowired
+  public PdfServiceImpl(FileSystemPathProperties fileSystemPathConfig) {
+    this.fileSystemPathConfig = fileSystemPathConfig;
+  }
 
   @Override
   public File getPdf(String template) throws PDFCreationFailedException {
