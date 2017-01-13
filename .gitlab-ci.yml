@@ -4,32 +4,17 @@ image: 4wits/builder-java
 variables:
   MAVEN_OPTS: -Dmaven.repo.local=/cache/maven.repository
   NEXT_VERSION: 'patch'
+  AWS_ACCESS_KEY_ID: AKIAIWR3HYDJJVRHJVHA
+  AWS_SECRET_ACCESS_KEY: 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
 
 stages:
   - test
   - build
   - deploy
 
-before_script:
-    #### Inject Private SSH Key to clone submodules
-    # Install ssh-agent if not already installed, it is required by Docker.
-    # (change apt-get to yum if you use a CentOS-based image)
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-    # Run ssh-agent (inside the build environment)
-    - eval $(ssh-agent -s)
-    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
-    - ssh-add <(echo "$SSH_PRIVATE_KEY")
-    # For Docker builds disable host key checking. Be aware that by adding that
-    # you are suspectible to man-in-the-middle attacks.
-    # WARNING: Use this only with the Docker executor, if you use it with shell
-    # you will overwrite your user's SSH config.
-    - mkdir -p ~/.ssh
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - npm install
-
 build:
-  stage: build
-  script:
+ stage: build
+ script:
     - mvn clean install -DskipTests=true
   artifacts:
     paths:
@@ -47,7 +32,10 @@ test:
 deploy:
   stage: deploy
   script:
-    - jake publish[$CI_BUILD_TAG]
-
+    - curl --data "token=8d8faf8ba42f43b254c572ad91060d&
+                   ref=integration&
+                   variables[SERVICE_NAME]=$CI_PROJECT_NAME&
+                   variables[SERVICE_VERSION]=$CI_BUILD_TAG"
+                   https://4wits.githost.io/api/v3/projects/62/trigger/builds
   only:
     - tags
