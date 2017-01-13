@@ -102,8 +102,8 @@
         </dependency>
         <dependency>
             <groupId>de.4wits</groupId>
-            <artifactId>message-starter</artifactId>
-            <version>1.0</version>
+            <artifactId>event-starter</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <!-- Enable for Database Usage
         <dependency>
