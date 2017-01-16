@@ -4,7 +4,7 @@ MAINTAINER Jonas Holtorf <Jonas.Holtorf@4wits.de>
 #"-agentpath:/jrebel/lib/libjrebel64.so", "-Drebel.log.file=/jrebel.log",
 #CMD ["java", "-Xdebug","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7000", "-Xmx200m", "-jar", "/app/app.jar"]
 WORKDIR /app
-CMD ["mvn","-Pdev","-Dfork=true", "-Drun.jvmArguments=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=7000" ,"spring-boot:run"]
+CMD ["mvn","-Pdev","-Dfork=true", "-Drun.jvmArguments=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=7000" , "clean", "spring-boot:run"]
 
 #CMD ["java", "-javaagent:/jrebel/jrebel.jar", "-Drebel.log.file=/jrebel.log", "-jar", "/app/app.jar"]
 
