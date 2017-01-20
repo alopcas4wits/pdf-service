@@ -24,7 +24,8 @@ migration:
     export: true
 
 leader:
-  enabled: false
+  attemptElection: false
+  test: true
 
 event:
   autoSetup: false
