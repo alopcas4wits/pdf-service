@@ -1,0 +1,45 @@
+image: 4wits/builder-java
+
+variables:
+  MAVEN_OPTS: -Dmaven.repo.local=/cache/maven.repository
+  NEXT_VERSION: 'patch'
+  AWS_ACCESS_KEY_ID: AKIAIWR3HYDJJVRHJVHA
+  AWS_SECRET_ACCESS_KEY: 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
+  REGISTRY: 631908550553.dkr.ecr.eu-central-1.amazonaws.com
+  RELEASE_IMAGE_TAG: 4wits/$CI_PROJECT_NAME
+
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  script:
+    - mvn clean test -DskipTests=false -Pdev
+
+build:
+  stage: build
+  script:
+    - mvn clean install -DskipTests=true
+    - eval $(aws ecr get-login --region eu-central-1)
+    - aws ecr create-repository --repository-name $RELEASE_IMAGE_TAG || true
+    - docker build . -f src/docker/release/Dockerfile --tag $REGISTRY/$RELEASE_IMAGE_TAG:$CI_BUILD_TAG
+    - docker push $REGISTRY/$RELEASE_IMAGE_TAG:$CI_BUILD_TAG
+    - docker logout
+  artifacts:
+    paths:
+    - target/*.jar
+  only:
+    - tags
+
+deploy:
+  stage: deploy
+  script:
+    - curl --data "token=8d8faf8ba42f43b254c572ad91060d&
+                   ref=integration&
+                   variables[SERVICE_NAME]=$CI_PROJECT_NAME&
+                   variables[SERVICE_VERSION]=$CI_BUILD_TAG"
+                   https://4wits.githost.io/api/v3/projects/62/trigger/builds
+  only:
+    - tags

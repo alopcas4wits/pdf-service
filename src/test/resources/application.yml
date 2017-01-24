@@ -1,0 +1,30 @@
+logging:
+  level:
+    de.wits: DEBUG
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  datsource:
+    url: jdbc:h2:~/test;MODE=MySQL
+
+cloud:
+  aws:
+    region:
+      static: eu-central-1
+
+migration:
+  enabled: false
+  hibernate:
+    export: true
+
+leader:
+  enabled: false
+
+event:
+  autoSetup: false
