@@ -1,23 +1,15 @@
 package de.wits.pdf.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-@ConfigurationProperties(prefix = "path")
+@Component
+@ConfigurationProperties(prefix = "pdf")
 public class FileSystemPathProperties {
-
-  private String pdf;
 
   private String temporal;
 
   private String pdfLatex;
-
-  public String getPdf() {
-    return pdf;
-  }
-
-  public void setPdf(String pdf) {
-    this.pdf = pdf;
-  }
 
   public String getTemporal() {
     return temporal;

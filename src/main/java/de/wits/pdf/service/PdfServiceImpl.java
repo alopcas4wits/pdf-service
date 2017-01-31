@@ -111,6 +111,7 @@ public class PdfServiceImpl implements PdfService {
       String mediaURL = matcher.group(1);
       mediaURL = mediaURL.replaceAll("}", ""); //FIXME: write a decent regex
       String filteredURL = mediaURL.replace("\\", "");
+      filteredURL = filteredURL.replace("\\&", "&");
       String mediaName = "img" + mediaIndex + ".png";
       File mediaFolder = new File(tempFolder, mediaName);
       LOG.info("Downloading media at " + filteredURL);

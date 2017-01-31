@@ -1,5 +1,7 @@
 FROM maven:3.3.9-jdk-8
 MAINTAINER Jonas Holtorf <Jonas.Holtorf@4wits.de>
+RUN apt-get update -y &&\
+    apt-get install texlive-full -y
 
 #"-agentpath:/jrebel/lib/libjrebel64.so", "-Drebel.log.file=/jrebel.log",
 #CMD ["java", "-Xdebug","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7000", "-Xmx200m", "-jar", "/app/app.jar"]
