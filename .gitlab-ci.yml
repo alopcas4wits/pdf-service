@@ -13,6 +13,9 @@ stages:
   - build
   - deploy
 
+before_script:
+  - rm -Rf /cache/maven.repository/de/4wits || true
+
 test:
   stage: test
   script:
