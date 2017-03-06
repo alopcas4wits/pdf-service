@@ -61,7 +61,7 @@ public class PdfServiceImpl implements PdfService {
       processBuilder.redirectErrorStream(true);
       processBuilder.directory(templateFile.getParentFile());
 
-      for (int i = 0; i < RUN_COUNT; ++i) {
+      for (int i = 1; i <= RUN_COUNT; ++i) {
         Process process = processBuilder.start();
         LOG.debug("Doing PDF creating run {} with the arguments: {}", i, processArgs);
         InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());

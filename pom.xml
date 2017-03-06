@@ -27,12 +27,12 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-devtools</artifactId>
                 </dependency>
+                <dependency>
+                    <groupId>de.4wits</groupId>
+                    <artifactId>elasticmq-starter</artifactId>
+                    <version>1.0</version>
+                </dependency>
             </dependencies>
-            <dependency>
-                <groupId>de.4wits</groupId>
-                <artifactId>elasticmq-starter</artifactId>
-                <version>1.0</version>
-            </dependency>
         </profile>
     </profiles>
 

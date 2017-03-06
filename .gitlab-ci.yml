@@ -6,7 +6,7 @@ variables:
   AWS_ACCESS_KEY_ID: AKIAIWR3HYDJJVRHJVHA
   AWS_SECRET_ACCESS_KEY: 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
   REGISTRY: 631908550553.dkr.ecr.eu-central-1.amazonaws.com
-  RELEASE_IMAGE_TAG: 4wits/pdf-service
+  RELEASE_IMAGE_TAG: 4wits/pdf-creation-service
 
 stages:
   - test
