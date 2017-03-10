@@ -1,3 +1,14 @@
+## Version 1.0.1 
+
+* missing tex in release
+
+Git commits from *ff3b97b6cf307da3fc50fda12fa0f0f1e2991dc2* to *ff3b97b6cf307da3fc50fda12fa0f0f1e2991dc2*
+
+**[2017-03-10 16:27:33 +0100] Jonas Holtorf<Jonas.Holtorf@gmail.com>:** missing tex installation... (HEAD -> master)
+
+
+---
+
 ## Version 1.0.0 
 
 * Initial Release
