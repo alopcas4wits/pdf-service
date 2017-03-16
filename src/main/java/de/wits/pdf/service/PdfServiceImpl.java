@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class PdfServiceImpl implements PdfService {
 
   private static final Logger LOG = LoggerFactory.getLogger(PdfServiceImpl.class);
-  private static final int RUN_COUNT = 1;
+  private static final int RUN_COUNT = 3;
 
   static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/.*&heightoffset=[0-9]*)");
 
