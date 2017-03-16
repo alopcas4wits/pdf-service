@@ -1,3 +1,14 @@
+## Version 1.0.2 
+
+* increased run count to 3
+
+Git commits from *b556da5a1a759c4f36c438d4b446cbc7ba0acfe0* to *b556da5a1a759c4f36c438d4b446cbc7ba0acfe0*
+
+**[2017-03-16 14:23:10 +0100] Jonas Holtorf<Jonas.Holtorf@gmail.com>:** increased run count (HEAD -> master)
+
+
+---
+
 ## Version 1.0.1 
 
 * missing tex in release
