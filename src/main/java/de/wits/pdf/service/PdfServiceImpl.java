@@ -22,7 +22,7 @@ public class PdfServiceImpl implements PdfService {
   private static final Logger LOG = LoggerFactory.getLogger(PdfServiceImpl.class);
   private static final int RUN_COUNT = 3;
 
-  static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/.*&heightoffset=[0-9]*)");
+  static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/[^}]*)");
 
   private transient FileSystemPathProperties fileSystemPathConfig;
 
