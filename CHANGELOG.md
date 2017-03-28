@@ -1,3 +1,14 @@
+## Version 1.0.3 
+
+* updated rex for img
+
+Git commits from *ce9613b77ffc2a54c2fb34c682e398ca4db8edda* to *ce9613b77ffc2a54c2fb34c682e398ca4db8edda*
+
+**[2017-03-28 18:33:44 +0200] Jonas Holtorf<Jonas.Holtorf@gmail.com>:** updated regex (HEAD -> master)
+
+
+---
+
 ## Version 1.0.2 
 
 * increased run count to 3
