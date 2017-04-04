@@ -1,3 +1,14 @@
+## Version 1.0.5 
+
+* optimize pdf using ghostscript
+
+Git commits from *8a69cedd3ba913de4c1e0732d15a8f96da5268f5* to *8a69cedd3ba913de4c1e0732d15a8f96da5268f5*
+
+**[2017-04-04 20:34:10 +0200] Jonas Holtorf<Jonas.Holtorf@gmail.com>:** optimize pdf (HEAD -> master)
+
+
+---
+
 ## Version 1.0.4 
 
 * fix replaced & tag
