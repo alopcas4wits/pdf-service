@@ -1,3 +1,14 @@
+## Version 1.0.4 
+
+* fix replaced & tag
+
+Git commits from *7adef3c7d8ea47dc74b63c2ebdcad3e7330e7d90* to *7adef3c7d8ea47dc74b63c2ebdcad3e7330e7d90*
+
+**[2017-04-04 15:27:20 +0200] Jonas Holtorf<Jonas.Holtorf@gmail.com>:** another replace (HEAD -> master)
+
+
+---
+
 ## Version 1.0.3 
 
 * updated rex for img
