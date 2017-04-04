@@ -49,6 +49,10 @@ public class PdfServiceImpl implements PdfService {
     }
 
     public File generate(File templateFile) throws PDFCreationFailedException, IOException {
+        return this.generate(templateFile, true);
+    }
+
+    public File generate(File templateFile, boolean optimize) throws PDFCreationFailedException, IOException {
         File outputFile = null;
         try {
             String pdfLatexPath = fileSystemPathConfig.getPdfLatex();
@@ -95,7 +99,41 @@ public class PdfServiceImpl implements PdfService {
                     throw new PDFCreationFailedException("pdfLaTeX was interrupted", ex);
                 }
             }
-            outputFile = new File(new FileSystemResource(new File(templateFile.getParent())).getFile(), templateFile.getName().replaceAll(".tex$", ".pdf"));
+            String resultFileName = templateFile.getName().replaceAll(".tex$", ".pdf");
+            if (optimize) {
+                String[] optimizeArgs = new String[]{
+                    "gs", "-sDEVICE=pdfwrite", "-dCompatibilityLevel=1.4", "-dNOPAUSE", "-dQUIET", "-dBATCH", "-sOutputFile=final-" + resultFileName, resultFileName
+                };
+                LOG.info("Running ghostscript optimization using {}", optimizeArgs);
+                ProcessBuilder optimizeProcessBuilder = new ProcessBuilder(optimizeArgs);
+                optimizeProcessBuilder.redirectErrorStream(true);
+                optimizeProcessBuilder.directory(templateFile.getParentFile());
+                Process process = optimizeProcessBuilder.start();
+                InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder outputBuilder = new StringBuilder();
+                String line = null;
+                try {
+                    while ((line = bufferedReader.readLine()) != null) {
+                        outputBuilder.append(line + System.getProperty("line.separator"));
+                    }
+                } finally {
+                    bufferedReader.close();
+                }
+
+                String outputStream = outputBuilder.toString();
+                try {
+                    if (process.waitFor() > 0) {
+                        LOG.warn("Optimize failed. Using non optimized");
+                        LOG.warn("Output: {}", outputStream);
+                    } else {
+                        resultFileName = "final-" + resultFileName;
+                    }
+                } catch (InterruptedException e) {
+                    LOG.warn("Interrupted while optimizing. use normal", e);
+                }
+            }
+            outputFile = new File(new FileSystemResource(new File(templateFile.getParent())).getFile(), resultFileName);
             LOG.info("PDF successfully created. Moving to output resource: {}", outputFile.getAbsolutePath());
         } finally {
             // Clear the temp folder after the work is done
