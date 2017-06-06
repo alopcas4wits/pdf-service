@@ -21,3 +21,41 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+# Remove Eclipse Files from git
+.eclipse-pmd
+.settings
+.project
+.classpath
+.factorypath
+target
+nbactions*.xml
+nb-configuration.xml
+context.xml
+buildNumber.properties
+.springBeans
+
+# Intellij
+.idea
+*.iml
+
+
+# Activiti internals
+*.bpmn2d
+
+*_.java
+# We use Spring
+persistence.xml
+
+# HTML development files
+node_modules
+
+# WebStorms (for html files) internal files
+.idea
+.pmd
+
+# Jrebel
+rebel*.xml
+
+# Tests output
+/reports
+/surefire

@@ -2,7 +2,10 @@ FROM alopcas4wits/full-pdflatex:1.0
 MAINTAINER Jonas Holtorf <Jonas.Holtorf@4wits.de>
 RUN mkdir /temporal
 
+RUN apt-get update -y &&\
+    apt-get install texlive-full -y
+
 ADD ./target/app.jar /app/
-CMD ["java", "-Xmx512m", "-Xms192m", "-jar", "/app/app.jar"]
+CMD ["java", "-Xmx128m", "-Xms64m", "-jar", "/app/app.jar"]
 
 EXPOSE 8080
