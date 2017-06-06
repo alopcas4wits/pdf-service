@@ -1,8 +1,6 @@
 package de.wits.pdf.controller;
 
 import de.wits.pdf.service.PdfService;
-import java.io.File;
-import java.nio.file.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +11,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.nio.file.Files;
+
 @RestController
 public class PdfController {
 
-  @Autowired
-  PdfService pdfService;
-
   private static final Logger log = LoggerFactory.getLogger(PdfController.class);
+    PdfService pdfService;
+
+    @Autowired
+    public PdfController(PdfService pdfService) {
+        this.pdfService = pdfService;
+    }
 
   @RequestMapping(value = "/pdf", method = RequestMethod.POST, consumes = "text/plain")
   public ResponseEntity<byte[]> getPdfFile(@RequestBody String template) {

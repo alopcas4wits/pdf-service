@@ -1,6 +1,13 @@
 package de.wits.pdf.service;
 
 import de.wits.pdf.configuration.FileSystemPathProperties;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -9,21 +16,13 @@ import java.net.URL;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PdfServiceImpl implements PdfService {
 
+    static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/.*&heightoffset=[0-9]*)");
   private static final Logger LOG = LoggerFactory.getLogger(PdfServiceImpl.class);
   private static final int RUN_COUNT = 1;
-
-  static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/.*&heightoffset=[0-9]*)");
-
   private transient FileSystemPathProperties fileSystemPathConfig;
 
   @Autowired
@@ -63,7 +62,7 @@ public class PdfServiceImpl implements PdfService {
 
       for (int i = 0; i < RUN_COUNT; ++i) {
         Process process = processBuilder.start();
-        LOG.debug("Doing PDF creating run {} with the arguments: {}", i, processArgs);
+          LOG.debug("PDF creation run {} with the arguments: {}", i, processArgs);
         InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder outputBuilder = new StringBuilder();
@@ -109,12 +108,11 @@ public class PdfServiceImpl implements PdfService {
     int mediaIndex = 0;
     while (matcher.find()) {
       String mediaURL = matcher.group(1);
-      mediaURL = mediaURL.replaceAll("}", ""); //FIXME: write a decent regex
       String filteredURL = mediaURL.replace("\\", "");
       filteredURL = filteredURL.replace("\\&", "&");
       String mediaName = "img" + mediaIndex + ".png";
       File mediaFolder = new File(tempFolder, mediaName);
-      LOG.info("Downloading media at " + filteredURL);
+        LOG.debug("Downloading media at " + filteredURL);
       try {
         FileUtils.copyURLToFile(new URL(filteredURL), mediaFolder);
       } catch (IOException ex) {
