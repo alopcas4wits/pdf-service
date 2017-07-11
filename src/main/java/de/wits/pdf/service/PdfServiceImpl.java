@@ -1,6 +1,14 @@
 package de.wits.pdf.service;
 
+import com.google.common.io.Files;
 import de.wits.pdf.configuration.FileSystemPathProperties;
+import net.lingala.zip4j.core.ZipFile;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,13 +18,6 @@ import java.net.URL;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PdfServiceImpl implements PdfService {
@@ -37,15 +38,49 @@ public class PdfServiceImpl implements PdfService {
     public File getPdf(String template) throws PDFCreationFailedException {
         File file = null;
         try {
-            File tmpFile = new File(fileSystemPathConfig.getTemporal() + File.separator + UUID.randomUUID(), "template.tex");
+            File tmpFile = new File(setupTmpFolder(), "template.tex");
             template = processTemplateMedia(template, tmpFile.getParentFile());
-            FileUtils.writeStringToFile(tmpFile, template, "UTF-8");
-            file = generate(tmpFile);
+            file = process(template, tmpFile);
         } catch (Exception e) {
             throw new PDFCreationFailedException("Could not create PDF Document.", e);
         }
 
         return file;
+    }
+
+    @Override
+    public File getPdf(byte[] zipFile) throws PDFCreationFailedException {
+        File file = null;
+        try {
+            File tmpFile = setupTmpFolder();
+
+            File writtenZipFile = new File(tmpFile, "tmp.zip");
+            tmpFile.mkdirs();
+            LOG.info("Moving zip file to " + tmpFile.getAbsolutePath());
+            Files.write(zipFile, writtenZipFile);
+
+            ZipFile zip = new ZipFile(writtenZipFile);
+            zip.extractAll(tmpFile.getPath());
+
+            String template = FileUtils.readFileToString(new File(tmpFile, "template.tex"));
+
+            template = processTemplateMedia(template, tmpFile.getParentFile());
+            file = process(template, new File(tmpFile, "template.tex"));
+
+        } catch (Exception e) {
+            throw new PDFCreationFailedException("Could not create PDF Document.", e);
+        }
+
+        return file;
+    }
+
+    private File setupTmpFolder() {
+        return new File(fileSystemPathConfig.getTemporal() + File.separator + UUID.randomUUID());
+    }
+
+    private File process(String template, File tmpFile) throws PDFCreationFailedException, IOException {
+        FileUtils.writeStringToFile(tmpFile, template, "UTF-8");
+        return generate(tmpFile);
     }
 
     public File generate(File templateFile) throws PDFCreationFailedException, IOException {
@@ -61,7 +96,7 @@ public class PdfServiceImpl implements PdfService {
             String shellEscapeCommand = "--shell-escape";
             String templatePath = templateFile.getAbsolutePath();
             String[] processArgs = new String[]{
-                pdfLatexPath, templatePath, pdfLatexMode, pdfLatexOutput, shellEscapeCommand
+                    pdfLatexPath, templatePath, pdfLatexMode, pdfLatexOutput, shellEscapeCommand
             };
             ProcessBuilder processBuilder = new ProcessBuilder(processArgs);
             processBuilder.redirectErrorStream(true);
@@ -102,7 +137,7 @@ public class PdfServiceImpl implements PdfService {
             String resultFileName = templateFile.getName().replaceAll(".tex$", ".pdf");
             if (optimize) {
                 String[] optimizeArgs = new String[]{
-                    "gs", "-sDEVICE=pdfwrite", "-dCompatibilityLevel=1.4", "-dNOPAUSE", "-dQUIET", "-dBATCH", "-sOutputFile=final-" + resultFileName, resultFileName
+                        "gs", "-sDEVICE=pdfwrite", "-dCompatibilityLevel=1.4", "-dNOPAUSE", "-dQUIET", "-dBATCH", "-sOutputFile=final-" + resultFileName, resultFileName
                 };
                 LOG.info("Running ghostscript optimization using {}", optimizeArgs);
                 ProcessBuilder optimizeProcessBuilder = new ProcessBuilder(optimizeArgs);
