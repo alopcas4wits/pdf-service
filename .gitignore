@@ -56,6 +56,9 @@ node_modules
 # Jrebel
 rebel*.xml
 
+# target
+./target/*
+
 # Tests output
 /reports
 /surefire
