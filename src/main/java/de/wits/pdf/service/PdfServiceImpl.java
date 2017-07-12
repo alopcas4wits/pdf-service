@@ -54,11 +54,11 @@ public class PdfServiceImpl implements PdfService {
         request.setTmpFolder(tmpFile);
 
         if (processQueue.offer(request)) {
-            LOG.debug("Had space inmediately. Queue size; " + processQueue.size());
+            LOG.trace("Had space inmediately. Queue size; " + processQueue.size());
             file = generatePdfSyncronously(request);
         } else {
             waitQueue.offer(request);
-            LOG.debug("Need to wait. Queue size is; " + processQueue.size());
+            LOG.trace("Need to wait. Queue size is; " + processQueue.size());
             file = generatePdfAsynchronously(request).get();
         }
 
@@ -66,11 +66,11 @@ public class PdfServiceImpl implements PdfService {
     }
 
     private CompletableFuture<File> generatePdfAsynchronously(PdfRequest request) throws InterruptedException, PDFCreationFailedException {
-        LOG.debug("Gotta wait. Queue size: " + waitQueue.size());
+        LOG.trace("Gotta wait. Queue size: " + waitQueue.size());
         while (!waitQueue.peek().equals(request)) { // Wait until you are the first one in the queue
             Thread.sleep(500);
         }
-        LOG.debug("First one in the queue. Gotta wait since the amount of processes running is " + processQueue.size());
+        LOG.trace("First one in the queue. Gotta wait since the amount of processes running is " + processQueue.size());
         while (processQueue.size() >= MAX_PROCESSES) { // Wait until there is space in the execution queue
             Thread.sleep(500);
         }
@@ -89,7 +89,7 @@ public class PdfServiceImpl implements PdfService {
             throw new PDFCreationFailedException("Could not create PDF Document.", e);
         } finally {
             processQueue.remove(request);
-            LOG.debug("Done. Clearing the process queue. New size: " + processQueue.size());
+            LOG.trace("Done. Clearing the process queue. New size: " + processQueue.size());
         }
         return file;
     }
