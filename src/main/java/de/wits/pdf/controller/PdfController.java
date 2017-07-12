@@ -1,5 +1,6 @@
 package de.wits.pdf.controller;
 
+import de.wits.pdf.model.PdfRequest;
 import de.wits.pdf.service.PdfService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.UUID;
 
 @RestController
 public class PdfController {
@@ -34,9 +36,8 @@ public class PdfController {
         File pdfFile;
 
         try {
-            pdfFile = pdfService.getPdf(template);
+            pdfFile = pdfService.getPdf(new PdfRequest(UUID.randomUUID(), template)).get();
             log.trace("Returning pdf file {} stored at {}", pdfFile.getName(), pdfFile.getAbsolutePath());
-            //resource = Files.readAllBytes(pdfService.getPdf(template).toPath());
         } catch (Exception e) {
             log.error("Exception occurred while generating the PDF file", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

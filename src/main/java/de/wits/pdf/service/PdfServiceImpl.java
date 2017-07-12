@@ -2,12 +2,14 @@ package de.wits.pdf.service;
 
 import com.google.common.io.Files;
 import de.wits.pdf.configuration.FileSystemPathProperties;
+import de.wits.pdf.model.PdfRequest;
 import net.lingala.zip4j.core.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -15,7 +17,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,27 +31,60 @@ public class PdfServiceImpl implements PdfService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PdfServiceImpl.class);
     private static final int RUN_COUNT = 3;
+    private static final int MAX_PROCESSES = 6;
 
     static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/[^}]*)");
 
     private transient FileSystemPathProperties fileSystemPathConfig;
 
+    Queue<PdfRequest> processQueue, waitQueue;
+
     @Autowired
     public PdfServiceImpl(FileSystemPathProperties fileSystemPathConfig) {
         this.fileSystemPathConfig = fileSystemPathConfig;
+        processQueue = new ArrayBlockingQueue<>(MAX_PROCESSES, true);
+        waitQueue = new LinkedList<>();
     }
 
+    @Async
     @Override
-    public File getPdf(String template) throws PDFCreationFailedException {
+    public CompletableFuture<File> getPdf(PdfRequest request) throws PDFCreationFailedException, ExecutionException, InterruptedException {
         File file = null;
-        try {
-            File tmpFile = new File(setupTmpFolder(), "template.tex");
-            template = processTemplateMedia(template, tmpFile.getParentFile());
-            file = process(template, tmpFile);
-        } catch (Exception e) {
-            throw new PDFCreationFailedException("Could not create PDF Document.", e);
+        File tmpFile = new File(setupTmpFolder(), "template.tex");
+        request.setTmpFolder(tmpFile);
+
+        if (processQueue.offer(request)) {
+            file = generatePdfSyncronously(request);
+        } else {
+            waitQueue.offer(request);
+            file = generatePdfAsynchronously(request).get();
         }
 
+        return CompletableFuture.completedFuture(file);
+    }
+
+    private CompletableFuture<File> generatePdfAsynchronously(PdfRequest request) throws InterruptedException, PDFCreationFailedException {
+        while (!waitQueue.peek().equals(request)) { // Wait until you are the first one in the queue
+            Thread.sleep(500);
+        }
+        while (processQueue.size() >= MAX_PROCESSES) { // Wait until there is space in the execution queue
+            Thread.sleep(500);
+        }
+        processQueue.add(request);
+
+        return CompletableFuture.completedFuture(generatePdfSyncronously(request));
+    }
+
+    private File generatePdfSyncronously(PdfRequest request) throws PDFCreationFailedException {
+        File file = null;
+        try {
+            String template = processTemplateMedia(request.getLatexTemplate(), request.getTmpFolder().getParentFile());
+            file = process(template, request.getTmpFolder());
+        } catch (Exception e) {
+            throw new PDFCreationFailedException("Could not create PDF Document.", e);
+        } finally {
+            processQueue.remove(request);
+        }
         return file;
     }
 
@@ -178,7 +218,7 @@ public class PdfServiceImpl implements PdfService {
         return outputFile;
     }
 
-    String processTemplateMedia(String template, File tempFolder) {
+    private String processTemplateMedia(String template, File tempFolder) {
         Matcher matcher = MEDIA_REGEX.matcher(template);
         String patchedTemplate = template;
         int mediaIndex = 0;
