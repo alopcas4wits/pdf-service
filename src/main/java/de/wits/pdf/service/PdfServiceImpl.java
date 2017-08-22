@@ -2,6 +2,7 @@ package de.wits.pdf.service;
 
 import com.google.common.io.Files;
 import de.wits.pdf.configuration.FileSystemPathProperties;
+import de.wits.pdf.configuration.GenerationProperties;
 import de.wits.pdf.model.PdfRequest;
 import net.lingala.zip4j.core.ZipFile;
 import org.apache.commons.io.FileUtils;
@@ -23,6 +24,7 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,12 +38,14 @@ public class PdfServiceImpl implements PdfService {
     static final Pattern MEDIA_REGEX = Pattern.compile("img:(https?:\\/\\/[^}]*)");
 
     private transient FileSystemPathProperties fileSystemPathConfig;
+    private transient GenerationProperties generationOptionsProperties;
 
     Queue<PdfRequest> processQueue, waitQueue;
 
     @Autowired
-    public PdfServiceImpl(FileSystemPathProperties fileSystemPathConfig) {
+    public PdfServiceImpl(FileSystemPathProperties fileSystemPathConfig, GenerationProperties generationOptionsProperties) {
         this.fileSystemPathConfig = fileSystemPathConfig;
+        this.generationOptionsProperties = generationOptionsProperties;
         processQueue = new ArrayBlockingQueue<>(MAX_PROCESSES, true);
         waitQueue = new LinkedList<>();
     }
@@ -166,12 +170,12 @@ public class PdfServiceImpl implements PdfService {
 
                 String outputStream = outputBuilder.toString();
                 try {
-                    int exitCode = process.waitFor();
+                    boolean exitStatus = process.waitFor(generationOptionsProperties.getTimeout(), TimeUnit.SECONDS);
 
-                    if (exitCode != 0) {
-                        LOG.warn("PDF Creation return non zero exit value: {}", exitCode);
+                    if (!exitStatus) {
+                        LOG.warn("PDF Creation return non zero exit value: {}", exitStatus);
                         LOG.warn("Output: {}", outputStream);
-                        throw new PDFCreationFailedException("Template wrong. Non Zero exit code: " + exitCode);
+                        throw new PDFCreationFailedException("Template wrong. Non Zero exit code: " + exitStatus);
 
                     }
                 } catch (InterruptedException ex) {
@@ -240,7 +244,8 @@ public class PdfServiceImpl implements PdfService {
             try {
                 FileUtils.copyURLToFile(new URL(filteredURL), mediaFolder);
             } catch (IOException ex) {
-                LOG.warn("Ignoring malformed URL: " + mediaURL);
+                LOG.warn("Ignoring malformed URL: " + filteredURL);
+                LOG.error("Error", ex);
             }
 
             patchedTemplate = patchedTemplate.replace("img:" + mediaURL, mediaName);
