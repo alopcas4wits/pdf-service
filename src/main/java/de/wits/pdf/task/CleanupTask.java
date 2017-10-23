@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 
 /**
  * Created by alberto on 22.08.17.
@@ -18,14 +17,16 @@ import java.text.SimpleDateFormat;
 @Component
 public class CleanupTask {
 
-    @Autowired
     FileSystemPathProperties fileSystemPathProperties;
+
+    @Autowired
+    public CleanupTask(FileSystemPathProperties fileSystemPathProperties) {
+        this.fileSystemPathProperties = fileSystemPathProperties;
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(CleanupTask.class);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-
-    @Scheduled(fixedRate = 5000)//cron = "0 0 4 1/2 * ? *")
+    @Scheduled(cron = "0 0 5 1/1 * ?")
     public void clearTempFolder() {
         LOG.info("Clearing temporal folder");
         try {
